@@ -1,0 +1,14 @@
+package:com.android.adservices.api
+package:com.dolby.android.audio.calibration
+package:com.android.health.connect.backuprestore
+package:com.android.federatedcompute.services
+package:com.android.virtualmachine.res
+package:com.netflix.tokenmanager
+package:com.google.android.tungsten.setupwraith
+package:com.android.networkstack
+package:com.android.tv.mdnsoffloadmanager
+package:com.android.uwb.resources
+package:com.dolby.android.audio.service
+package:com.android.healthconnect.controller
+package:com.mediatek.speakerservice
+package:com.amazon.amazonvideo.livingroom

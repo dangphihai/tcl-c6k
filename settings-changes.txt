@@ -1,0 +1,2 @@
+secure enabled_accessibility_services 
+secure accessibility_enabled 0

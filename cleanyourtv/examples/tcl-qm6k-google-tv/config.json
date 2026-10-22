@@ -1,0 +1,22 @@
+{
+  "settings_key_keycodes": [83],
+  "app_keys": [
+    "190:com.google.android.youtube.tv",
+    "4062:com.netflix.ninja",
+    "scan:242:com.netflix.ninja",
+    "191:com.netflix.ninja",
+    "4168:vn.vtv.vtvgotv",
+    "4020:com.oxootv.spagreen",
+    "4159:com.coccoc.trinhduyet_tv"
+  ],
+  "dock_apps": [
+    "com.netflix.ninja",
+    "com.google.android.youtube.tv",
+    "net.fptplay.ottbox",
+    "com.apple.atve.androidtv.appletv",
+    "com.oxootv.spagreen",
+    "org.xbmc.kodi",
+    "com.google.android.youtube.tvmusic",
+    "com.coccoc.trinhduyet_tv"
+  ]
+}

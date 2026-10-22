@@ -1,0 +1,13 @@
+package:com.apple.atve.androidtv.appletv
+package:com.wbd.stream
+package:net.fptplay.ottbox
+package:vn.vtv.vtvgotv
+package:com.google.android.videos
+package:com.nuvio.app
+package:org.xbmc.kodi
+package:com.oxootv.spagreen
+package:com.spotify.tv.android
+package:com.viettel.tv360.tv
+package:com.iqiyi.i18n.tv
+package:com.analiti.fastest.android
+package:com.coccoc.trinhduyet_tv

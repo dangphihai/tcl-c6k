@@ -1,0 +1,29 @@
+# OS metadata
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Gradle & Android build files
+.gradle/
+build/
+**/build/
+captures/
+.externalNativeBuild/
+.cxx/
+local.properties
+*.hprof
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
