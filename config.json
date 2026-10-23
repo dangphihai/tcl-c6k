@@ -1,0 +1,30 @@
+{
+  "greeting_name": "Hải",
+  "background_color": "#6750A4",
+  "wallpaper": false,
+  "columns": 4,
+  "rows_below_dock": 0,
+  "animations": true,
+  "advanced_effects": true,
+  "settings_key_keycodes": [83],
+  "settings_key_panel": false,
+  "app_keys": [
+    "190:com.google.android.youtube.tv",
+    "4065:com.google.android.youtube.tv",
+    "4062:com.netflix.ninja",
+    "191:com.netflix.ninja",
+    "4168:vn.vtv.vtvgotv",
+    "4020:com.oxootv.spagreen",
+    "4159:com.coccoc.trinhduyet_tv"
+  ],
+  "dock_apps": [
+    "com.netflix.ninja",
+    "com.google.android.youtube.tv",
+    "net.fptplay.ottbox",
+    "com.apple.atve.androidtv.appletv",
+    "com.oxootv.spagreen",
+    "org.xbmc.kodi",
+    "com.google.android.youtube.tvmusic",
+    "com.coccoc.trinhduyet_tv"
+  ]
+}

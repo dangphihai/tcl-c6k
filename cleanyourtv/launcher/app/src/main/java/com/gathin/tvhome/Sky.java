@@ -54,10 +54,7 @@ final class Sky {
     private static final int NIGHT_BOTTOM = 0xFF0B1326;
 
     // Anchors were picked around a temperate evening: full night until half past five, dawn before
-    // seven, the warmest glow between seven in the evening and a quarter to eight. With a location
-    // set, at(minute, sunrise, sunset) stretches this reference day onto the real one.
-    static final int REF_SUNRISE = 450;
-    static final int REF_SUNSET = 1140;
+    // seven, the warmest glow between seven in the evening and a quarter to eight.
     private static final Stop[] STOPS = {
             new Stop(0, NIGHT_TOP, NIGHT_MID, NIGHT_BOTTOM, 0, 0.30f),
             new Stop(320, NIGHT_TOP, NIGHT_MID, NIGHT_BOTTOM, 0, 0.30f),
@@ -74,21 +71,6 @@ final class Sky {
     };
 
     private Sky() {
-    }
-
-    /**
-     * The palette at {@code minuteOfDay} on a day whose sun rises at {@code sunrise} and sets at
-     * {@code sunset} (minutes of the day): night, day and evening are each stretched piecewise so
-     * the reference sunrise and sunset glows land on the real ones.
-     */
-    static Palette at(int minuteOfDay, int sunrise, int sunset) {
-        if (sunrise <= 0 || sunset >= 1440 || sunrise >= sunset) return at(minuteOfDay);
-        int m = Math.max(0, Math.min(1440, minuteOfDay));
-        float ref;
-        if (m < sunrise) ref = m * REF_SUNRISE / (float) sunrise;
-        else if (m < sunset) ref = REF_SUNRISE + (m - sunrise) * (REF_SUNSET - REF_SUNRISE) / (float) (sunset - sunrise);
-        else ref = REF_SUNSET + (m - sunset) * (1440 - REF_SUNSET) / (float) (1440 - sunset);
-        return at(Math.round(ref));
     }
 
     /** The palette at {@code minuteOfDay}, clamped to a day. */
@@ -110,6 +92,47 @@ final class Sky {
                 lerpColor(a.bottom, b.bottom, t),
                 lerp(a.sun, b.sun, t),
                 lerp(a.sunX, b.sunX, t));
+    }
+
+    /**
+     * The sky under the weather: cloud greys it and keeps less of the sun's glow, rain and thunder darken it,
+     * fog and snow lighten it. Brightness is scaled rather than mixed towards a colour, so night stays night.
+     */
+    static Palette weathered(Palette clear, Weather.Sky weather) {
+        switch (weather) {
+            case PARTLY: return covered(clear, 0.20f, 1.00f, 0.70f);
+            case CLOUDY: return covered(clear, 0.60f, 1.05f, 0.25f);
+            case FOG: return covered(clear, 0.75f, 1.15f, 0f);
+            case RAIN: return covered(clear, 0.55f, 0.80f, 0f);
+            case THUNDER: return covered(clear, 0.45f, 0.65f, 0f);
+            case SNOW: return covered(clear, 0.70f, 1.25f, 0f);
+            default: return clear;
+        }
+    }
+
+    private static Palette covered(Palette clear, float grey, float brightness, float sun) {
+        return new Palette(cover(clear.top, grey, brightness), cover(clear.mid, grey, brightness),
+                cover(clear.bottom, grey, brightness), Math.round(clear.sun * sun), clear.sunX);
+    }
+
+    private static int cover(int color, float grey, float brightness) {
+        int l = luminance(color);
+        int greyed = lerpColor(color, 0xFF000000 | l << 16 | l << 8 | l, grey);
+        int r = Math.min(255, Math.round(((greyed >> 16) & 0xFF) * brightness));
+        int g = Math.min(255, Math.round(((greyed >> 8) & 0xFF) * brightness));
+        int b = Math.min(255, Math.round((greyed & 0xFF) * brightness));
+        return 0xFF000000 | r << 16 | g << 8 | b;
+    }
+
+    /** Perceived brightness of an opaque colour, 0 to 255. */
+    static int luminance(int color) {
+        return (((color >> 16) & 0xFF) * 299 + ((color >> 8) & 0xFF) * 587 + (color & 0xFF) * 114) / 1000;
+    }
+
+    /** How coloured it is: the spread between its strongest and weakest channel, 0 to 255. */
+    static int chroma(int color) {
+        int r = (color >> 16) & 0xFF, g = (color >> 8) & 0xFF, b = color & 0xFF;
+        return Math.max(r, Math.max(g, b)) - Math.min(r, Math.min(g, b));
     }
 
     /** Minute of day, 0 to 1439, of a wall clock time. */

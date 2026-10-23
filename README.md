@@ -1,10 +1,17 @@
-# TCL 65C6K (Android 14) Debloat & Custom Launcher Setup
+# TCL 65C6K (Android 14) Debloat & Material 3 Expressive Launcher
 
 Dự án tối ưu hóa, debloat và tùy biến toàn diện giao diện cho **TCL 65C6K Google TV (Android 14)** qua kết nối không dây ADB:
 - Loại bỏ toàn bộ quảng cáo, tracking, telemetry và bloatware của TCL & Google TV.
-- Thay thế Google TV LauncherX bằng [CleanYourTV](https://github.com/Gathin23/cleanyourtv) tùy biến sâu.
+- Thay thế Google TV LauncherX bằng **Material 3 Expressive Launcher** (km-launcher dựa trên freeTV & CleanYourTV).
 - Tích hợp font chữ **Google Sans Flex TV** (hỗ trợ 100% tiếng Việt có dấu).
-- Tùy biến hiệu ứng focus: Ánh sáng hào quang (Soft Glow) bao quanh ứng dụng và phóng to 1.1x (loại bỏ viền chữ nhật trượt).
+- **Hệ thống Widgets thông minh**:
+  - Thời tiết (Open-Meteo) và Chất lượng không khí (AQI) tự động theo vị trí IP.
+  - Đồng hồ hiển thị thời gian, lời chào buổi sáng/trưa/chiều/tối theo tên chủ sở hữu.
+  - Lịch âm Việt Nam: Hiển thị năm Canh/Tân/Nhâm/Quý/Bính..., ngày/tháng âm lịch và đếm ngược tới các ngày lễ (Tết, Giáng sinh).
+  - Đồng hồ đo tài nguyên hệ thống (RAM, Bộ nhớ trong, CPU).
+- **Hiệu ứng chuyển động Material 3 Expressive**:
+  - Hình nền chuyển động hữu cơ M3 (Expressive shapes: Cookie & Clover) tự xoay nhẹ, đổi hình dạng và tạo hiệu ứng chiều sâu parallax.
+  - Thẻ ứng dụng đang chọn (Focus) phóng to mượt mà, bao quanh bởi viền bo tròn màu chủ đạo (M3 Primary indicator).
 - Gán toàn bộ các phím tắt cứng trên Remote TCL RC813A (Netflix, YouTube, Web, TCL Channel, VTV Go, Settings).
 - Tuyệt đối an toàn: Sử dụng `pm disable-user --user 0`, không root, không sửa phân vùng hệ thống, có script hoàn nguyên 1-click `restore.sh`.
 
@@ -25,6 +32,7 @@ Dự án tối ưu hóa, debloat và tùy biến toàn diện giao diện cho **
 tcl-c6k/
 ├── README.md                  # Hướng dẫn chi tiết dự án
 ├── ORIGINAL_SPEC.md           # Đặc tả yêu cầu kỹ thuật & quy tắc an toàn ban đầu
+├── config.json                # Cấu hình theme M3 Expressive, dock & phím remote
 ├── disabled.txt               # Danh sách 25 package bloatware đã tắt an toàn
 ├── settings-changes.txt       # Nhật ký các cài đặt hệ thống đã thay đổi
 ├── lib.zsh                    # Thư viện hàm shell zsh (dis, restore_all, home_new, ...)
@@ -42,7 +50,7 @@ tcl-c6k/
 │   ├── settings-system.txt    # Cài đặt system gốc
 │   ├── home.txt               # Default launcher ban đầu
 │   └── wifi-cname.txt         # Tên tiến trình quản lý Wi-Fi (android.uid.system:1000)
-└── cleanyourtv/               # Toàn bộ mã nguồn CleanYourTV v2.6.0 đã tùy biến
+└── cleanyourtv/               # Toàn bộ mã nguồn launcher đã tích hợp M3 Expressive
     ├── launcher/              # Source code Android Studio / Gradle
     ├── examples/              # Cấu hình mẫu cho các dòng TV
     └── tools/                 # Bộ công cụ build & cấu hình theme
@@ -52,11 +60,11 @@ tcl-c6k/
 
 ## 🎮 Ánh xạ phím cứng Remote (TCL RC813A)
 
-Tất cả các phím bấm nhanh trên remote đều được can thiệp trực tiếp qua CleanYourTV (`InputKeyService` & `HomeKeyService`), không cần cài đặt thêm ứng dụng thứ 3:
+Tất cả các phím bấm nhanh trên remote đều được can thiệp trực tiếp qua launcher (`InputKeyService` & `HomeKeyService`), không cần cài đặt thêm ứng dụng thứ 3:
 
 | Nút cứng trên Remote | Keycode / Scan code | Hành động / Ứng dụng khởi chạy |
 | :--- | :--- | :--- |
-| **Home** | `KEYCODE_HOME` (3) | Trở về thẳng màn hình chính **CleanYourTV** |
+| **Home** | `KEYCODE_HOME` (3) | Trở về thẳng màn hình chính launcher |
 | **Netflix** | `4062`, `191`, `scan:242` | Mở ứng dụng **Netflix** (`com.netflix.ninja`) |
 | **YouTube** | `190`, `4065` | Mở ứng dụng **YouTube** (`com.google.android.youtube.tv`) |
 | **Web** | `4159` (`usage:0x000c029c`) | Mở trình duyệt **Cốc Cốc TV** (`com.coccoc.trinhduyet_tv`) |
@@ -66,20 +74,20 @@ Tất cả các phím bấm nhanh trên remote đều được can thiệp trự
 
 ---
 
-## 🎨 Tùy biến CleanYourTV
+## 🎨 Tùy biến Material 3 Expressive
 
 ### 1. Bố cục ứng dụng (Grid & Dock)
 * **Hàng Dock (Hàng 1)**: Netflix, YouTube, FPT Play, Apple TV.
 * **Hàng Lưới (Hàng 2)**: Phim 4K, Kodi, YouTube Music, Cốc Cốc TV.
 
-### 2. Font chữ Google Sans Flex TV
-* Tích hợp font biến thiên chính thức `GoogleSansFlexTV[wght].ttf` từ Google Fonts.
-* Đảm bảo hiển thị đầy đủ 100% các ký tự dấu tiếng Việt, không bị lỗi font hoặc rơi về font Roboto thô.
+### 2. Bảng Widgets thông minh
+* Tự động lấy thông tin thời tiết & chất lượng không khí theo định vị IP.
+* Lịch âm tiếng Việt chuẩn xác.
+* Đo RAM và bộ nhớ khả dụng theo thời gian thực.
 
-### 3. Hiệu ứng chọn ứng dụng (Focus Effect)
-* **GlowView (`GlowView.java`)**: Tạo ánh sáng hào quang (Soft Glow) phía sau card được chọn.
-* **Scale 1.1x**: Thẻ ứng dụng đang chọn phóng to nhẹ nhàng, mượt mà.
-* **Ẩn GlassView**: Loại bỏ hoàn toàn khối hộp chữ nhật trượt nguyên bản vốn gây phân tâm khi di chuyển con trỏ.
+### 3. Font chữ Google Sans Flex TV
+* Tích hợp font biến thiên chính thức `google_sans_flex.ttf`.
+* Đảm bảo hiển thị đầy đủ 100% các ký tự dấu tiếng Việt sắc nét.
 
 ---
 
@@ -148,11 +156,11 @@ adb connect <IP_CỦA_TV>:5555
 adb install -r apk/CleanYourTV-TCL-C6K.apk
 ```
 
-### 3. Vô hiệu hóa bloatware & thiết lập Home mặc định
+### 3. Đẩy cấu hình theme & thiết lập quyền
 ```bash
-source lib.zsh
-dis_list disabled.txt
-home_new
+adb push config.json /sdcard/Android/data/com.gathin.tvhome/files/config.json
+adb shell pm grant com.gathin.tvhome android.permission.ACCESS_FINE_LOCATION
+adb shell pm grant com.gathin.tvhome android.permission.WRITE_SECURE_SETTINGS
 ```
 
 ---
@@ -163,10 +171,3 @@ Nếu bạn muốn trở lại hoàn toàn giao diện Google TV mặc định v
 ```bash
 bash restore.sh <IP_CỦA_TV>
 ```
-
----
-
-## 🔐 Khuyến cáo bảo mật
-Sau khi cài đặt và sử dụng ổn định, hãy vào:
-`Cài đặt` > `Hệ thống` > `Tùy chọn cho nhà phát triển` > **Tắt Gỡ lỗi không dây**.
-Cổng 5555 sẽ được đóng lại để đảm bảo an toàn tuyệt đối.

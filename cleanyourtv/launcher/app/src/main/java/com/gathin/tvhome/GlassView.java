@@ -2,75 +2,65 @@ package com.gathin.tvhome;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.view.View;
 
 /**
- * A translucent glass slab: soft sheen fill, bright top specular, crisp rim and a faint outer glow.
- * One instance floats over the grid and is moved with spring animations between tiles.
+ * The Material 3 focus indicator: a 3dp ring, 2dp outside the focused tile, in the scheme's secondary
+ * colour. One instance floats over the grid and springs between tiles. (Named for the glass highlight
+ * it replaced; the activity and layouts still refer to it by that name.)
  */
 public class GlassView extends View {
 
-    private final Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint specular = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint rim = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint glow = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint ring = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF rect = new RectF();
     private final float density;
-    private float radius;
-    /** Glow colour as 0xRRGGBB: white normally, a festival's accent (diya gold) while a festive skin is on. */
-    private int glowRgb = 0xFFFFFF;
-    /** Glow strength: the white glow stays faint, a coloured one needs more alpha to read as warm light. */
-    private int glowAlpha = 0x55;
+    /** The view is laid out this far outside the tile on each side (MainActivity's pad). */
+    private final float inset;
+    private float tileRadius;
+    private int ringColor = Palette.currentOrBaseline().secondary;
+    private int accent;
 
     public GlassView(Context context, AttributeSet attrs) {
         super(context, attrs);
         density = getResources().getDisplayMetrics().density;
-        radius = 20f * density;
-        glow.setStyle(Paint.Style.STROKE);
+        inset = 6f * density;
+        tileRadius = Shapes.TILE_FOCUSED * density;
+        ring.setStyle(Paint.Style.STROKE);
+        ring.setStrokeWidth(Shapes.FOCUS_RING_WIDTH * density);
+        ring.setColor(ringColor);
+        // Cache the ring as a texture: the spring only changes translation, so the GPU moves it without redrawing.
         setLayerType(LAYER_TYPE_HARDWARE, null);
     }
 
-    /** Tints the rim and the outer glow; 0 restores the plain white glass. */
+    /** Colours the ring with an accent (festival, reorder mode); 0 goes back to the scheme's colour. */
     void setAccent(int argb) {
-        if (argb == 0) {
-            glowRgb = 0xFFFFFF;
-            glowAlpha = 0x55;
-        } else {
-            glowRgb = argb & 0xFFFFFF;
-            glowAlpha = 0x85;
-        }
+        accent = argb;
+        ring.setColor(accent != 0 ? accent | 0xFF000000 : ringColor);
         invalidate();
     }
 
+    /** The scheme's secondary colour, from the dynamic colour scheme. */
+    void setRingColor(int argb) {
+        ringColor = argb;
+        if (accent == 0) ring.setColor(ringColor);
+        invalidate();
+    }
+
+    /** The focused tile's corner radius in pixels; the ring adds its offset so the two stay concentric. */
     void setRadius(float px) {
-        radius = px;
+        tileRadius = px;
         invalidate();
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        float inset = 6f * density;
-        rect.set(inset, inset, getWidth() - inset, getHeight() - inset);
-
-        // Hiệu ứng ánh sáng lan toả (soft ambient glow) quanh ứng dụng được chọn, không vẽ viền cứng
-        int rings = 14;
-        float step = inset / rings;
-        glow.setStrokeWidth(step + 0.5f);
-        for (int i = 0; i < rings; i++) {
-            float o = step * (i + 0.5f);
-            float t = 1f - (float) i / rings;
-            glow.setColor((Math.round(glowAlpha * t * t) << 24) | glowRgb);
-            canvas.drawRoundRect(rect.left - o, rect.top - o, rect.right + o, rect.bottom + o, radius + o, radius + o, glow);
-        }
+        float stroke = ring.getStrokeWidth();
+        float out = Shapes.FOCUS_RING_OFFSET * density + stroke / 2f;
+        rect.set(inset - out, inset - out, getWidth() - inset + out, getHeight() - inset + out);
+        float r = tileRadius + out;
+        canvas.drawRoundRect(rect, r, r, ring);
     }
 }
