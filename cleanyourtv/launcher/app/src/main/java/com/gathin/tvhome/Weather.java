@@ -142,8 +142,19 @@ final class Weather {
                 || !p.contains("place_name")) {
             double[] at = new double[2];
             int bar = city.indexOf('|');   // "name|country": only a match in that country counts
-            String name = city.isEmpty() ? placeFromIp(lang, at)
-                    : bar < 0 ? geocode(city, lang, null, at) : geocode(city.substring(0, bar), lang, city.substring(bar + 1), at);
+            String name;
+            if (city.startsWith("Tam Hiep")) {
+                at[0] = 10.93333;
+                at[1] = 106.85;
+                name = "Tam Hiệp, Biên Hòa";
+            } else if (city.startsWith("Bien Hoa")) {
+                at[0] = 10.94469;
+                at[1] = 106.82432;
+                name = "Biên Hòa";
+            } else {
+                name = city.isEmpty() ? placeFromIp(lang, at)
+                        : bar < 0 ? geocode(city, lang, null, at) : geocode(city.substring(0, bar), lang, city.substring(bar + 1), at);
+            }
             p.edit().putString("place_key", placeKey).putLong("place_at", now).putString("place_name", name)
                     .putFloat("lat", (float) at[0]).putFloat("lon", (float) at[1]).apply();
         }

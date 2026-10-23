@@ -170,5 +170,5 @@
     <bool name="widgets">true</bool>
     <!-- The weather widget's city, e.g. "Hanoi". Empty: wherever the TV's IP address is (approximate;
          two services can disagree by a whole city, so set this when it matters). -->
-    <string name="weather_city" translatable="false"></string>
+    <string name="weather_city" translatable="false">Tam Hiep, Bien Hoa|VN</string>
 </resources>
